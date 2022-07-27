@@ -9,6 +9,7 @@ from state_sprite import StateSprite;
 from transitions_sprite import TransitionsSprite;
 
 STATE_COLOR = (0, 0, 0);
+CURR_STATE_COLOR = (0, 100, 200);
 STATE_TEXT_COLOR = (255, 0, 0);
 STATE_WIDTH = 40;
 
@@ -33,6 +34,8 @@ class MachineWindow(Surface):
         );
         
         self.machine = machine;
+
+        self.curr_state = 0;
 
         self.bg_color = bg_color;
         self.state_font = state_font;
@@ -73,10 +76,13 @@ class MachineWindow(Surface):
 
                 self.create_transitions_sprite(s1, s2);
 
-        # Render sprites
+        # Initially update state sprites (for setting current state)
 
-        self.transition_sprites.draw(self);
-        self.state_sprites.draw(self);
+        self.update_state_sprites();
+
+        # Draw sprites
+
+        self.redraw_sprites();
 
         # Render status text
 
@@ -92,13 +98,27 @@ class MachineWindow(Surface):
             dest = STATUS_TEXT_POS
         );
 
+    def redraw_sprites(self) -> None:
+
+        # Render sprites
+
+        self.transition_sprites.draw(self);
+        self.state_sprites.draw(self);
+
+    def update_state_sprites(self) -> None:
+
+        self.state_sprites.update(curr_state = self.curr_state);
+
+        self.redraw_sprites();
+
     def create_state_sprite(self,
         state: State
         ) -> None:
 
         s = StateSprite(
             state = state,
-            color = STATE_COLOR,
+            state_color = STATE_COLOR,
+            curr_state_color = CURR_STATE_COLOR,
             text_color = STATE_TEXT_COLOR,
             bg_color = self.bg_color,
             width = STATE_WIDTH,
@@ -148,3 +168,9 @@ class MachineWindow(Surface):
         self.status_text = text;
 
         self.refresh();
+
+    def set_curr_state(self,
+        n: int) -> None:
+
+        self.curr_state = n;
+        self.update_state_sprites();

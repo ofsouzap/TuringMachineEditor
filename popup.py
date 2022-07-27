@@ -2,10 +2,18 @@ from typing import Tuple as tTuple;
 import tkinter as tk;
 import re;
 
-INT_PATTERN = r"^(-?[0-9]+)|(-?)$";
+from machine import SYMBOL_MAX_LENGTH;
+
+SYMBOL_PATTERN = r"^[A-z0-9]{0," + str(SYMBOL_MAX_LENGTH) + r"}$";
+INT_PATTERN = r"^-?[0-9]*$";
+
+def verify_symbol(s: str):
+    x = re.match(SYMBOL_PATTERN, s) != None;
+    return x;
 
 def str_is_int(s: str):
-    return re.match(INT_PATTERN, s) != None;
+    x = re.match(INT_PATTERN, s) != None;
+    return x;
 
 def run_transition_form() -> tTuple[str, str, int] | None:
 
@@ -15,6 +23,11 @@ def run_transition_form() -> tTuple[str, str, int] | None:
 
     window.title("New Transition");
     window.geometry("256x128");
+
+    # Create enter callback
+
+    def enter_callback() -> None:
+        window.quit();
 
     # Create entry variables
 
@@ -27,12 +40,16 @@ def run_transition_form() -> tTuple[str, str, int] | None:
     lbl_read_sym = tk.Label(window, text = "Read Symbol");
     lbl_write_sym = tk.Label(window, text = "Write Symbol");
     lbl_head_move = tk.Label(window, text = "Head Move Amount");
-
-    ety_read_sym = tk.Entry(window, textvariable = read_sym_var);
-    ety_write_sym = tk.Entry(window, textvariable = write_sym_var);
+    #TODO - fix validations not working
+    ety_read_sym = tk.Entry(window, textvariable = read_sym_var, validate = "key", validatecommand = (window.register(verify_symbol), "%P"));
+    ety_write_sym = tk.Entry(window, textvariable = write_sym_var, validate = "key", validatecommand = (window.register(verify_symbol), "%P"));
     ety_head_move = tk.Entry(window, textvariable = head_move_var, validate = "key", validatecommand = (window.register(str_is_int), "%P"));
 
-    btn_submit = tk.Button(window, text = "Enter", command = window.quit);
+    btn_submit = tk.Button(window, text = "Enter", command = enter_callback);
+
+    # Bind return key to enter button callback
+
+    window.bind("<Return>", lambda evt: enter_callback());
 
     # Place widgets in window
 
@@ -49,6 +66,7 @@ def run_transition_form() -> tTuple[str, str, int] | None:
 
     # Run window until it closes
 
+    ety_read_sym.focus_set();
     window.mainloop();
 
     # Check if window was closed by trying to read variable
@@ -63,7 +81,7 @@ def run_transition_form() -> tTuple[str, str, int] | None:
     if ety_head_move.get() == "":
         # If head move entry is blank, default to value of 0
         ety_head_move.insert(0, "0");
-        
+
     elif ety_head_move.get() == "-":
         # If head move entry is negative sign, default to value of -1 ("-" is already written so isn't included in insertion)
         ety_head_move.insert(0, "1");

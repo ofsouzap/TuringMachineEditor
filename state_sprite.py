@@ -8,7 +8,8 @@ class StateSprite(Sprite):
 
     def __init__(self,
         state: State,
-        color: tTuple[int, int, int],
+        state_color: tTuple[int, int, int],
+        curr_state_color: tTuple[int, int, int],
         text_color: tTuple[int, int, int],
         bg_color: tTuple[int, int, int],
         width: int,
@@ -19,35 +20,67 @@ class StateSprite(Sprite):
         self.width = width;
 
         self.state = state;
+        self.is_curr = False;
 
-        n = self.state.n;
+        self.font = font;
+
         pos = (
             self.state.pos[0] - (width // 2),
             self.state.pos[1] - (width // 2)
         );
 
+        # Save colors
+
+        self.state_color = state_color;
+        self.curr_state_color = curr_state_color;
+        self.text_color = text_color;
+        self.bg_color = bg_color;
+
         # Set up image surface
 
         self.image = pygame.Surface(size = (width, width)); # Creates the initial surface to draw the sprite on
 
-        self.image.fill(color = bg_color); # Fills the surface with the background color
-        self.image.set_colorkey(bg_color); # Sets what color pixels count as transparent pixels
+        # Set up rect
+
+        self.rect = self.image.get_rect();
+        self.rect.x = pos[0];
+        self.rect.y = pos[1];
+
+        # Draw onto surface
+        
+        self.redraw();
+
+    def update(self,
+        curr_state: int) -> None:
+
+        super().update();
+
+        self.is_curr = curr_state == self.state.n;
+
+        self.redraw();
+
+    def redraw(self) -> None:
+
+        self.image.fill(color = self.bg_color); # Fills the surface with the background color
+        self.image.set_colorkey(self.bg_color); # Sets what color pixels count as transparent pixels
 
         # Draw circle to surface
+
+        color = (self.state_color) if (not self.is_curr) else (self.curr_state_color);
 
         pygame.draw.circle(
             surface = self.image,
             color = color,
-            center = (width // 2, width // 2),
-            radius = width // 2
+            center = (self.width // 2, self.width // 2),
+            radius = self.width // 2
         );
 
         # Write n on circle
         
-        text = font.render(
-            str(n),
+        text = self.font.render(
+            str(self.state.n),
             True,
-            text_color,
+            self.text_color,
             None
         );
         
@@ -55,8 +88,8 @@ class StateSprite(Sprite):
         text_height = text.get_rect().height;
 
         text_pos = (
-            width // 2 - (text_width // 2),
-            width // 2 - (text_height // 2)
+            self.width // 2 - (text_width // 2),
+            self.width // 2 - (text_height // 2)
         );
 
         self.image.blit(
@@ -64,11 +97,9 @@ class StateSprite(Sprite):
             dest = text_pos
         );
 
-        # Set up rect
-
-        self.rect = self.image.get_rect();
-        self.rect.x = pos[0];
-        self.rect.y = pos[1];
+    def set_is_curr(self,
+        b: bool) -> None:
+        self.is_curr = b;
 
     def check_pos_in_sprite(self,
         pos: tTuple[int, int]

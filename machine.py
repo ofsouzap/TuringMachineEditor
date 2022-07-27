@@ -1,6 +1,8 @@
 from typing import List as tList;
 from typing import Tuple as tTuple;
 
+SYMBOL_MAX_LENGTH = 4; # Maximum number of chars a symbol can be
+
 class State:
 
     def __init__(self,
@@ -49,6 +51,17 @@ class Transition:
 
         return s;
 
+    def applies_to(self,
+        start_state: int,
+        read_symbol: str):
+
+        """Returns whether the transition applies to being in state start_state and reading symbol read_symbol"""
+
+        return (self.start == start_state) and (self.read_symbol == read_symbol);
+
+    def output_to_tuple(self):
+        return (self.end, self.write_symbol, self.head_move);
+
 class Machine:
 
     def __init__(self):
@@ -56,7 +69,7 @@ class Machine:
         self.states = [];
         self.transitions = [];
 
-    def get_next_state_number(self) -> int:
+    def get_next_available_state_number(self) -> int:
 
         """Gets the next available number for a state in this machine"""
 
@@ -72,13 +85,13 @@ class Machine:
     def add_state(self,
         pos: tTuple[int, int]) -> State:
 
-        s = State(self.get_next_state_number(), pos);
+        s = State(self.get_next_available_state_number(), pos);
 
         self.states.append(s);
 
         return s;
 
-    def add_transition(self,
+    def try_add_transition(self,
         start: int,
         end: int,
         read_symbol: str,
@@ -93,9 +106,30 @@ class Machine:
             head_move = head_move
         );
 
-        #TODO - check transition is unique (therefore doesn't require non-deterministic behaviour)
+        if not self.check_transition_would_be_unique(t):
+            return False;
         
         self.transitions.append(t);
+
+        return True;
+
+    def check_transition_would_be_unique(self,
+        new_t: Transition
+        ) -> bool:
+
+        combs = [];
+
+        for t in self.transitions:
+
+            c = (t.start, t.end, t.read_symbol);
+
+            if c in combs:
+                return False;
+
+            else:
+                combs.append(c);
+
+        return True;
 
     def get_state_by_number(self,
         n: int) -> State | None:
@@ -134,3 +168,17 @@ class Machine:
                     new_transitions_list.append(t);
 
             self.transitions = new_transitions_list;
+
+    def determine_output(self,
+        start_state: int,
+        read_symbol: str
+        ) -> tTuple[int, str, int] | None:
+
+        """Determines what the machine would do when in the specified state and reading the specified symbol. Returns (next_state, write_symbol, head_move) or None if no transitions are found."""
+
+        for t in self.transitions:
+
+            if t.applies_to(start_state, read_symbol):
+                return t.output_to_tuple();
+
+        return None;
