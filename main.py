@@ -4,7 +4,7 @@ from pygame import Rect;
 import pygame;
 from keybindings import Keybinding;
 
-from main_window import MainController;
+from main_controller import MainController;
 
 WINDOW_TITLE = "Turing Machine Editor";
 

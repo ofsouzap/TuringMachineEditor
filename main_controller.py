@@ -162,6 +162,17 @@ class MainController:
 
         return tuple(size);
 
+    @staticmethod
+    def global_pos_to_rect_relative(pos: tTuple[int, int],
+        rect: Rect) -> tTuple[int, int]:
+
+        """Takes a position and returns that position but relative to the top-left of the provided Rect."""
+
+        return (
+            pos[0] - rect.left,
+            pos[1] - rect.top
+        );
+
     def check_can_create_state_in_pos(self,
         pos: tTuple[int, int]) -> bool:
 
@@ -283,13 +294,10 @@ class MainController:
         # N.B. mouse position passed to click-handling methods is done relative to the window
 
         if self.check_mouse_in_machine_window(mouse_pos):
-            self.handle_machine_window_click(mouse_pos);
+            self.handle_machine_window_click(MainController.global_pos_to_rect_relative(mouse_pos, self.machine_window_rect));
 
         elif self.check_mouse_in_controls_window(mouse_pos):
-            self.handle_controls_window_click((
-                mouse_pos[0] - self.controls_window_rect.left,
-                mouse_pos[1] - self.controls_window_rect.top
-            ));
+            self.handle_controls_window_click(MainController.global_pos_to_rect_relative(mouse_pos, self.controls_window_rect));
 
     def handle_machine_window_click(self,
         pos: tTuple[int, int]) -> None:
