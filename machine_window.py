@@ -98,6 +98,9 @@ class MachineWindow(Surface):
             dest = STATUS_TEXT_POS
         );
 
+    def set_machine(self, m: Machine) -> None:
+        self.machine = m;
+
     def redraw_sprites(self) -> None:
 
         # Render sprites

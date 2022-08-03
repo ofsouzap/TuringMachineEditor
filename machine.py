@@ -1,5 +1,9 @@
 from typing import List as tList;
 from typing import Tuple as tTuple;
+from struct import pack, unpack;
+
+INT32_FMT = "i";
+INT32_SIZE = 4;
 
 SYMBOL_MAX_LENGTH = 4; # Maximum number of chars a symbol can be
 
@@ -96,7 +100,7 @@ class Machine:
         end: int,
         read_symbol: str,
         write_symbol: str,
-        head_move: int) -> None:
+        head_move: int) -> bool:
 
         t = Transition(
             start = start,

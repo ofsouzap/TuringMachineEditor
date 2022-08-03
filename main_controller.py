@@ -5,12 +5,15 @@ from time import time as now;
 from pygame import Rect;
 from pygame.event import Event;
 import pygame;
+from tkinter.filedialog import asksaveasfile, askopenfile;
 
 from keybindings import Keybinding;
 
-from machine import State, Transition, Machine;
+from machine import Machine;
 from tape import Tape, TAPE_DEFAULT_SYMBOL;
+from machine_serializer import MachineSerializer, MACHINE_FILETYPES, MACHINE_FILE_EXTENSION;
 
+from options_window import OptionsWindow;
 from machine_window import MachineWindow, STATE_WIDTH;
 from tape_window import TapeWindow;
 from controls_window import ControlsWindow;
@@ -33,6 +36,7 @@ class MainController:
 
     def __init__(self,
         window_title: str,
+        options_window_rect: Rect,
         machine_window_rect: Rect,
         tape_window_rect: Rect,
         controls_window_rect: Rect,
@@ -64,12 +68,14 @@ class MainController:
 
         # Create fonts
 
+        self.options_font = pygame.font.SysFont("Courier New", 20);
         self.state_font = pygame.font.SysFont("Courier New", 24);
         self.transition_font = pygame.font.SysFont("Courier New", 12);
         self.tape_symbol_font = pygame.font.SysFont("Courier New", 20);
 
         # Store settings
 
+        self.options_window_rect = options_window_rect;
         self.machine_window_rect = machine_window_rect;
         self.tape_window_rect = tape_window_rect;
         self.controls_window_rect = controls_window_rect;
@@ -103,6 +109,12 @@ class MainController:
         self.tape = Tape(TAPE_DEFAULT_SYMBOL);
 
         # Create sub-windows
+
+        self.options_window = OptionsWindow(
+            size = self.options_window_rect.size,
+            bg_color = bg_color,
+            font = self.options_font
+        );
 
         self.machine_window = MachineWindow(
             size = self.machine_window_rect.size,
@@ -185,6 +197,11 @@ class MainController:
 
         return True;
 
+    def set_machine(self, m: Machine) -> None:
+        self.machine = m;
+        self.machine_window.set_machine(m);
+        self.machine_window.refresh();
+
     # Main loop
 
     def stop_main_loop(self) -> None:
@@ -208,6 +225,7 @@ class MainController:
 
             # Blit sub-windows onto main window
             
+            self.window.blit(self.options_window, self.options_window_rect.topleft);
             self.window.blit(self.machine_window, self.machine_window_rect.topleft);
             self.window.blit(self.tape_window, self.tape_window_rect.topleft);
             self.window.blit(self.controls_window, self.controls_window_rect.topleft);
@@ -258,6 +276,10 @@ class MainController:
 
     # Checking window mouse is in
 
+    def check_mouse_in_options_window(self,
+        pos: tTuple[int, int]) -> bool:
+        return self.options_window_rect.collidepoint(pos);
+
     def check_mouse_in_machine_window(self,
         pos: tTuple[int, int]) -> bool:
         return self.machine_window_rect.collidepoint(pos);
@@ -293,11 +315,54 @@ class MainController:
 
         # N.B. mouse position passed to click-handling methods is done relative to the window
 
-        if self.check_mouse_in_machine_window(mouse_pos):
+        if self.check_mouse_in_options_window(mouse_pos):
+            self.handle_options_window_click(MainController.global_pos_to_rect_relative(mouse_pos, self.options_window_rect));
+
+        elif self.check_mouse_in_machine_window(mouse_pos):
             self.handle_machine_window_click(MainController.global_pos_to_rect_relative(mouse_pos, self.machine_window_rect));
 
         elif self.check_mouse_in_controls_window(mouse_pos):
             self.handle_controls_window_click(MainController.global_pos_to_rect_relative(mouse_pos, self.controls_window_rect));
+
+    def handle_options_window_click(self,
+        pos: tTuple[int, int]) -> None:
+
+        if self.run_mode != RUN_MODE_STOPPED:
+            return; # Can't use options while running machine
+
+        if self.options_window.pos_in_save_button(pos):
+            self.handle_options_window_save_button();
+
+        elif self.options_window.pos_in_load_button(pos):
+            self.handle_options_window_load_button();
+
+    def handle_options_window_save_button(self):
+
+        file = asksaveasfile(mode = "wb", defaultextension = MACHINE_FILE_EXTENSION, filetypes = MACHINE_FILETYPES);
+
+        if file != None:
+
+            bs = MachineSerializer.serialize(self.machine);
+
+            file.write(bs);
+
+            file.close();
+
+            self.machine_window.set_status_text("Saved machine.");
+
+    def handle_options_window_load_button(self):
+
+        file = askopenfile(mode = "rb", defaultextension = MACHINE_FILE_EXTENSION, filetypes = MACHINE_FILETYPES);
+
+        if file != None:
+
+            self.machine = MachineSerializer.deserialize(file.read());
+
+            file.close();
+
+            self.set_machine(self.machine);
+            self.machine_window.refresh();
+            self.machine_window.set_status_text("Loaded machine.");
 
     def handle_machine_window_click(self,
         pos: tTuple[int, int]) -> None:

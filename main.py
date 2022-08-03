@@ -1,5 +1,3 @@
-from typing import List as tList;
-from typing import Tuple as tTuple;
 from pygame import Rect;
 import pygame;
 from keybindings import Keybinding;
@@ -8,9 +6,10 @@ from main_controller import MainController;
 
 WINDOW_TITLE = "Turing Machine Editor";
 
-MACHINE_WINDOW_RECT = Rect((0, 0), (1000, 500));
-TAPE_WINDOW_RECT = Rect((0, 500), (1000, 100));
-CONTROLS_WINDOW_RECT = Rect((0, 600), (1000, 100));
+OPTIONS_WINDOW_RECT = Rect((0, 0), (1000, 100))
+MACHINE_WINDOW_RECT = Rect((0, 100), (1000, 500));
+TAPE_WINDOW_RECT = Rect((0, 600), (1000, 100));
+CONTROLS_WINDOW_RECT = Rect((0, 700), (1000, 100));
 
 BG_COLOR = (255, 255, 255);
 
@@ -29,6 +28,7 @@ def main():
 
     controller = MainController(
         window_title = WINDOW_TITLE,
+        options_window_rect = OPTIONS_WINDOW_RECT,
         machine_window_rect = MACHINE_WINDOW_RECT,
         tape_window_rect = TAPE_WINDOW_RECT,
         controls_window_rect = CONTROLS_WINDOW_RECT,
