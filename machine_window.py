@@ -16,6 +16,7 @@ STATE_WIDTH = 40;
 TRANSITION_COLOR = (255, 0, 255);
 TRANSITION_TEXT_COLOR = (255, 0, 0);
 TRANSITION_LINE_WIDTH = 5;
+TRANSITION_LOOP_HEIGHT = 50;
 
 STATUS_TEXT_COLOR = (0, 0, 255);
 STATUS_TEXT_POS = (5, 5);
@@ -70,7 +71,7 @@ class MachineWindow(Surface):
 
             self.create_state_sprite(s1);
 
-            for j in range(i + 1, len(self.machine.states)):
+            for j in range(i, len(self.machine.states)):
 
                 s2 = self.machine.states[j];
 
@@ -147,6 +148,7 @@ class MachineWindow(Surface):
             text_color = TRANSITION_TEXT_COLOR,
             bg_color = self.bg_color,
             line_width = TRANSITION_LINE_WIDTH,
+            loop_transition_height = TRANSITION_LOOP_HEIGHT,
             font = self.transition_font
         );
 

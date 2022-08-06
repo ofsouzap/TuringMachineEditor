@@ -18,6 +18,7 @@ class TransitionsSprite(Sprite):
         text_color: tTuple[int, int, int],
         bg_color: tTuple[int, int, int],
         line_width: int,
+        loop_transition_height: int,
         font: pygame.font.Font):
 
         super().__init__();
@@ -48,8 +49,9 @@ class TransitionsSprite(Sprite):
             surface = self.image,
             color = color,
             start = line_start,
-            end = line_end,
-            width = line_width
+            end = line_end if start != end else line_start,
+            width = line_width,
+            loop_height = loop_transition_height
         );
 
         # Write details along line
@@ -107,7 +109,8 @@ class TransitionsSprite(Sprite):
         color: tTuple[int, int, int],
         start: Vector2,
         end: Vector2,
-        width: int) -> Vector2:
+        width: int,
+        loop_height: int) -> Vector2:
 
         """Draws the line for a transition and returns the position that the transition details should be centered on."""
 
@@ -129,4 +132,15 @@ class TransitionsSprite(Sprite):
 
             # Less-usual case: a transition from a state back to itself
 
-            pass; #TODO
+            top = start - Vector2(0, loop_height);
+            center = (start + top) // 2;
+
+            pygame.draw.circle(
+                surface = surface,
+                color = color,
+                center = center,
+                radius = loop_height // 2,
+                width = width
+            );
+
+            return top;
