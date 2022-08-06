@@ -1,7 +1,7 @@
 from typing import List as tList;
 from typing import Tuple as tTuple;
 
-TAPE_DEFAULT_SYMBOL = "-";
+TAPE_DEFAULT_SYMBOL = "0";
 
 class Tape:
 
