@@ -1,6 +1,4 @@
-from typing import List as tList;
 from typing import Tuple as tTuple;
-from math import sqrt;
 from time import time as now;
 from pygame import Rect, Vector2;
 from pygame.event import Event;
@@ -12,6 +10,7 @@ from keybindings import Keybinding;
 from machine import Machine;
 from tape import Tape, TAPE_DEFAULT_SYMBOL;
 from machine_serializer import MachineSerializer, MACHINE_FILETYPES, MACHINE_FILE_EXTENSION;
+from tape_files import try_read_tape, TAPE_FILETYPES;
 
 from options_window import OptionsWindow;
 from machine_window import MachineWindow, STATE_WIDTH;
@@ -200,6 +199,11 @@ class MainController:
         self.machine_window.set_machine(m);
         self.machine_window.refresh();
 
+    def set_tape(self, t: Tape) -> None:
+        self.tape = t;
+        self.tape_window.set_tape(t);
+        self.tape_window.refresh();
+
     def refresh_control_buttons_shading(self) -> None:
 
         if self.run_mode == RUN_MODE_STOPPED:
@@ -349,6 +353,9 @@ class MainController:
         elif self.options_window.pos_in_load_button(pos):
             self.handle_options_window_load_button();
 
+        elif self.options_window.pos_in_load_tape_button(pos):
+            self.handle_options_window_load_tape_button();
+
     def handle_options_window_save_button(self):
 
         file = asksaveasfile(mode = "wb", defaultextension = MACHINE_FILE_EXTENSION, filetypes = MACHINE_FILETYPES);
@@ -376,6 +383,24 @@ class MainController:
             self.set_machine(self.machine);
             self.machine_window.refresh();
             self.machine_window.set_status_text("Loaded machine.");
+
+    def handle_options_window_load_tape_button(self):
+
+        file = askopenfile(mode = "r", filetypes = TAPE_FILETYPES);
+
+        if file != None:
+
+            t = try_read_tape(file);
+
+            if t != None:
+
+                self.set_tape(t);
+
+            else:
+
+                self.machine_window.set_status_text("Failed to load tape from file.");
+
+            file.close();
 
     def handle_machine_window_click(self,
         pos: Vector2) -> None:

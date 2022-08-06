@@ -152,6 +152,9 @@ class TapeWindow(Surface):
         self.tape_sprites.draw(self);
         self.value_sprites.draw(self);
 
+    def set_tape(self, t: Tape) -> None:
+        self.tape = t;
+
     def scroll_amount(self, n: int) -> None:
         self.scroll_to(self.index + n);
 

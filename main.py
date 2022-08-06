@@ -39,14 +39,6 @@ def main():
         run_change_delay = MACHINE_RUN_CHANGE_DELAY
     );
 
-    #TODO - remove from here once done testing
-    controller.tape.set(0, "a");
-    controller.tape.set(1, "b");
-    controller.tape.set(2, "a");
-    controller.tape.set(3, "b");
-    controller.tape_window.refresh();
-    #TODO - remove to here once done testing
-
     controller.run_main_loop();
 
     controller.cleanup();
