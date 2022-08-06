@@ -2,7 +2,7 @@ from typing import List as tList;
 from typing import Tuple as tTuple;
 from math import sqrt;
 from time import time as now;
-from pygame import Rect;
+from pygame import Rect, Vector2;
 from pygame.event import Event;
 import pygame;
 from tkinter.filedialog import asksaveasfile, askopenfile;
@@ -175,22 +175,20 @@ class MainController:
         return tuple(size);
 
     @staticmethod
-    def global_pos_to_rect_relative(pos: tTuple[int, int],
-        rect: Rect) -> tTuple[int, int]:
+    def global_pos_to_rect_relative(pos: Vector2,
+        rect: Rect) -> Vector2:
 
         """Takes a position and returns that position but relative to the top-left of the provided Rect."""
 
-        return (
-            pos[0] - rect.left,
-            pos[1] - rect.top
-        );
+        return pos - Vector2(rect.topleft);
 
     def check_can_create_state_in_pos(self,
-        pos: tTuple[int, int]) -> bool:
+        pos: Vector2) -> bool:
 
         for s in self.machine.states:
 
-            dist = sqrt((s.pos[0] - pos[0])**2 + (s.pos[1] - pos[1])**2);
+            disp = s.pos - pos;
+            dist = disp.magnitude();
 
             if dist <= (STATE_WIDTH * self.state_minimum_separation_factor):
                 return False;
@@ -277,19 +275,19 @@ class MainController:
     # Checking window mouse is in
 
     def check_mouse_in_options_window(self,
-        pos: tTuple[int, int]) -> bool:
+        pos: Vector2) -> bool:
         return self.options_window_rect.collidepoint(pos);
 
     def check_mouse_in_machine_window(self,
-        pos: tTuple[int, int]) -> bool:
+        pos: Vector2) -> bool:
         return self.machine_window_rect.collidepoint(pos);
 
     def check_mouse_in_tape_window(self,
-        pos: tTuple[int, int]) -> bool:
+        pos: Vector2) -> bool:
         return self.tape_window_rect.collidepoint(pos);
 
     def check_mouse_in_controls_window(self,
-        pos: tTuple[int, int]) -> bool:
+        pos: Vector2) -> bool:
         return self.controls_window_rect.collidepoint(pos);
 
     # Handling pygame events
@@ -311,7 +309,7 @@ class MainController:
 
     def handle_evt_mousedown(self) -> None:
 
-        mouse_pos = pygame.mouse.get_pos();
+        mouse_pos = Vector2(pygame.mouse.get_pos());
 
         # N.B. mouse position passed to click-handling methods is done relative to the window
 
@@ -325,7 +323,7 @@ class MainController:
             self.handle_controls_window_click(MainController.global_pos_to_rect_relative(mouse_pos, self.controls_window_rect));
 
     def handle_options_window_click(self,
-        pos: tTuple[int, int]) -> None:
+        pos: Vector2) -> None:
 
         if self.run_mode != RUN_MODE_STOPPED:
             return; # Can't use options while running machine
@@ -365,7 +363,7 @@ class MainController:
             self.machine_window.set_status_text("Loaded machine.");
 
     def handle_machine_window_click(self,
-        pos: tTuple[int, int]) -> None:
+        pos: Vector2) -> None:
 
         if self.run_mode != RUN_MODE_STOPPED:
             return; # Can't edit machine while running
@@ -380,7 +378,7 @@ class MainController:
             self.handle_machine_window_click_transition(pos);
 
     def handle_machine_window_click_create(self,
-        pos: tTuple[int, int]) -> None:
+        pos: Vector2) -> None:
 
         clicked_state = self.machine_window.get_state_in_pos(pos);
 
@@ -407,7 +405,7 @@ class MainController:
             self.machine_window.set_status_text(f"Creating transition from {clicked_state.n}...");
 
     def handle_machine_window_click_delete(self,
-        pos: tTuple[int, int]) -> None:
+        pos: Vector2) -> None:
         
         clicked_state = self.machine_window.get_state_in_pos(pos);
 
@@ -418,7 +416,7 @@ class MainController:
             self.machine_window.set_status_text(f"Deleted state {clicked_state.n}.");
 
     def handle_machine_window_click_transition(self,
-        pos: tTuple[int, int]) -> None:
+        pos: Vector2) -> None:
 
         if self.transition_create_start == None:
             raise Exception("No start has been set when trying to create a transition.");
@@ -463,7 +461,7 @@ class MainController:
         self.machine_click_mode = CLICK_MODE_CREATE;
 
     def handle_controls_window_click(self,
-        pos: tTuple[int, int]) -> None:
+        pos: Vector2) -> None:
 
         if self.controls_window.pos_in_play_button(pos):
             self.handle_controls_window_play_button();

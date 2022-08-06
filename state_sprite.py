@@ -2,6 +2,7 @@ from typing import List as tList;
 from typing import Tuple as tTuple;
 from pygame.sprite import Sprite;
 import pygame;
+from pygame import Vector2;
 from machine import State;
 
 class StateSprite(Sprite):
@@ -24,10 +25,7 @@ class StateSprite(Sprite):
 
         self.font = font;
 
-        pos = (
-            self.state.pos[0] - (width // 2),
-            self.state.pos[1] - (width // 2)
-        );
+        pos = self.state.pos - Vector2(width // 2);
 
         # Save colors
 
@@ -71,7 +69,7 @@ class StateSprite(Sprite):
         pygame.draw.circle(
             surface = self.image,
             color = color,
-            center = (self.width // 2, self.width // 2),
+            center = Vector2(self.width // 2),
             radius = self.width // 2
         );
 
@@ -87,10 +85,9 @@ class StateSprite(Sprite):
         text_width = text.get_rect().width;
         text_height = text.get_rect().height;
 
-        text_pos = (
-            self.width // 2 - (text_width // 2),
-            self.width // 2 - (text_height // 2)
-        );
+        text_pos = Vector2(self.width // 2);
+        text_pos[0] -= text_width // 2;
+        text_pos[1] -= text_height // 2;
 
         self.image.blit(
             source = text,
@@ -102,11 +99,12 @@ class StateSprite(Sprite):
         self.is_curr = b;
 
     def check_pos_in_sprite(self,
-        pos: tTuple[int, int]
+        pos: Vector2
         ) -> bool:
 
         """Checks whether the provided position is in the bounds of this state. Bounds are taken to be in the shape of a circle around the center"""
         
-        sqr_d = ((pos[0] - self.state.pos[0])**2) + ((pos[1] - self.state.pos[1])**2);
+        disp = pos - self.state.pos;
+        sqr_d = disp.magnitude_squared();
 
         return sqr_d <= (self.width/2)**2;

@@ -1,14 +1,15 @@
 from typing import Callable as tCallable;
 from typing import Tuple as tTuple;
 from pygame.sprite import Sprite;
+from pygame.math import Vector2;
 import pygame;
 
 class ControlButtonSprite(Sprite):
 
     def __init__(self,
-        center_pos: tTuple[int, int],
+        center_pos: Vector2,
         width: int,
-        draw_icon_call: tCallable[[pygame.Surface, tTuple[int, int, int], tTuple[int, int], int], None],
+        draw_icon_call: tCallable[[pygame.Surface, tTuple[int, int, int], Vector2, int], None],
         icon_padding: int,
         button_bg_color: tTuple[int, int, int],
         icon_color: tTuple[int, int, int],
@@ -24,10 +25,7 @@ class ControlButtonSprite(Sprite):
         self.icon_color = icon_color;
         self.main_bg_color = main_bg_color;
 
-        pos = (
-            self.center_pos[0] - (self.width // 2),
-            self.center_pos[1] - (self.width // 2)
-        );
+        pos = self.center_pos - Vector2(self.width // 2);
 
         # Set up image
 
@@ -67,7 +65,7 @@ class ControlButtonSprite(Sprite):
         self.draw_icon_call(
             self.image,
             self.icon_color,
-            (
+            Vector2(
                 self.image.get_width() // 2,
                 self.image.get_height() // 2
             ),

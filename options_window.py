@@ -1,7 +1,7 @@
 from typing import Callable as tCallable;
 from typing import Tuple as tTuple;
 from typing import List as tList;
-from pygame import Surface;
+from pygame import Surface, Vector2;
 import pygame;
 
 from options_button_sprite import OptionsButtonSprite;
@@ -80,9 +80,9 @@ class OptionsWindow(Surface):
         );
 
     def pos_in_save_button(self,
-        pos: tTuple[int, int]) -> bool:
+        pos: Vector2) -> bool:
         return self.save_button.rect.collidepoint(pos);
 
     def pos_in_load_button(self,
-        pos: tTuple[int, int]) -> bool:
+        pos: Vector2) -> bool:
         return self.load_button.rect.collidepoint(pos);

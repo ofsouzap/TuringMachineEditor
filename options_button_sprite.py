@@ -1,12 +1,13 @@
 from typing import Callable as tCallable;
 from typing import Tuple as tTuple;
 from pygame.sprite import Sprite;
+from pygame import Vector2;
 import pygame;
 
 class OptionsButtonSprite(Sprite):
 
     def __init__(self,
-        center_pos: tTuple[int, int],
+        center_pos: Vector2,
         dims: tTuple[int, int],
         text: str,
         font: pygame.font.Font,
@@ -24,10 +25,7 @@ class OptionsButtonSprite(Sprite):
         self.text_color = text_color;
         self.main_bg_color = main_bg_color;
 
-        pos = (
-            self.center_pos[0] - (self.dims[0] // 2),
-            self.center_pos[1] - (self.dims[1] // 2)
-        );
+        pos = self.center_pos - (Vector2(self.dims) // 2);
 
         # Set up image
 
@@ -70,7 +68,7 @@ class OptionsButtonSprite(Sprite):
             self.text_color,
             None
         );
-
+        
         self.image.blit(
             source = text_surface,
             dest = (

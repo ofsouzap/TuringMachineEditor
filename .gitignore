@@ -155,4 +155,4 @@ cython_debug/
 TODO.txt
 
 # Saved machines
-saved_machines/*
+saved_machines/

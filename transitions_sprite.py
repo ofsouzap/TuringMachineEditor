@@ -1,6 +1,7 @@
 from typing import List as tList;
 from typing import Tuple as tTuple;
 from pygame.sprite import Sprite;
+from pygame import Vector2;
 import pygame;
 from machine import Machine, Transition, State;
 
@@ -10,6 +11,7 @@ class TransitionsSprite(Sprite):
 
     def __init__(self,
         machine: Machine,
+        parent_dims: tTuple[int, int],
         start: State,
         end: State,
         color: tTuple[int, int, int],
@@ -30,41 +32,23 @@ class TransitionsSprite(Sprite):
 
         # Calculate positions
 
-        start_pos_global = start.pos;
-        end_pos_global = end.pos;
-
-        origin = ( # The point that will be the top-left position
-            min(start_pos_global[0], end_pos_global[0]),
-            min(start_pos_global[1], end_pos_global[1])
-        );
-
-        width = abs(start_pos_global[0] - end_pos_global[0]);
-        height = abs(start_pos_global[1] - end_pos_global[1]);
-
-        start_pos_local = (
-            start_pos_global[0] - origin[0],
-            start_pos_global[1] - origin[1]
-        );
-
-        end_pos_local = (
-            end_pos_global[0] - origin[0],
-            end_pos_global[1] - origin[1]
-        );
+        line_start = start.pos;
+        line_end = end.pos;
 
         # Set up surface
 
-        self.image = pygame.Surface(size = (width, height)); # Creates the initial surface to draw the sprite on
+        self.image = pygame.Surface(size = parent_dims); # Creates the initial surface to draw the sprite on
 
         self.image.fill(color = bg_color); # Fills the surface with the background color
         self.image.set_colorkey(bg_color); # Sets what color pixels count as transparent pixels
 
-        # Draw arrow to surface
-        
-        pygame.draw.line(
+        # Draw connector
+
+        text_center_pos = TransitionsSprite.draw_connector(
             surface = self.image,
             color = color,
-            start_pos = start_pos_local,
-            end_pos = end_pos_local,
+            start = line_start,
+            end = line_end,
             width = line_width
         );
 
@@ -107,15 +91,42 @@ class TransitionsSprite(Sprite):
         self.image.blit(
             source = details_text_surface,
             dest = (
-                (width // 2) - (details_texts_surface_width // 2),
-                (height // 2) - (details_texts_surface_height // 2),
+                text_center_pos[0] - (details_texts_surface_width // 2),
+                text_center_pos[1] - (details_texts_surface_height // 2),
             )
         );
-
-        #TODO - create text(s), render it/them, blit it/them onto surface in correct position(s)
 
         # Set up rect
 
         self.rect = self.image.get_rect();
-        self.rect.x = origin[0];
-        self.rect.y = origin[1];
+        self.rect.x = 0;
+        self.rect.y = 0;
+
+    @staticmethod
+    def draw_connector(surface: pygame.Surface,
+        color: tTuple[int, int, int],
+        start: Vector2,
+        end: Vector2,
+        width: int) -> Vector2:
+
+        """Draws the line for a transition and returns the position that the transition details should be centered on."""
+
+        if start != end:
+
+            # Normal case: different states having a transition between them
+
+            pygame.draw.line(
+                surface = surface,
+                color = color,
+                start_pos = start,
+                end_pos = end,
+                width = width
+            );
+
+            return (start + end) // 2;
+
+        else:
+
+            # Less-usual case: a transition from a state back to itself
+
+            pass; #TODO

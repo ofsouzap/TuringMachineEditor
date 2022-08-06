@@ -1,7 +1,7 @@
 from typing import Callable as tCallable;
 from typing import Tuple as tTuple;
 from typing import List as tList;
-from pygame import Surface;
+from pygame import Surface, Vector2;
 import pygame;
 
 from control_button_sprite import ControlButtonSprite;
@@ -54,18 +54,17 @@ class ControlsWindow(Surface):
 
         self.button_sprites = pygame.sprite.Group();
 
-        center = (
+        center = Vector2(
             self.get_width() // 2,
             self.get_height() // 2
         );
 
+        button_separation_displacement = Vector2(1, 0) * (BUTTON_WIDTH + BUTTON_SEPARATION);
+
         # Pause button
 
         self.pause_button = ControlButtonSprite(
-            center_pos = (
-                center[0] - (BUTTON_WIDTH + BUTTON_SEPARATION),
-                center[1]
-            ),
+            center_pos = center - button_separation_displacement,
             width = BUTTON_WIDTH,
             draw_icon_call = ControlsWindow.draw_pause_icon,
             icon_padding = BUTTON_ICON_PADDING,
@@ -79,10 +78,7 @@ class ControlsWindow(Surface):
         # Play button
 
         self.play_button = ControlButtonSprite(
-            center_pos = (
-                center[0],
-                center[1]
-            ),
+            center_pos = center,
             width = BUTTON_WIDTH,
             draw_icon_call = ControlsWindow.draw_play_icon,
             icon_padding = BUTTON_ICON_PADDING,
@@ -96,10 +92,7 @@ class ControlsWindow(Surface):
         # Stop button
 
         self.stop_button = ControlButtonSprite(
-            center_pos = (
-                center[0] + (BUTTON_WIDTH + BUTTON_SEPARATION),
-                center[1]
-            ),
+            center_pos = center + button_separation_displacement,
             width = BUTTON_WIDTH,
             draw_icon_call = ControlsWindow.draw_stop_icon,
             icon_padding = BUTTON_ICON_PADDING,
@@ -129,34 +122,33 @@ class ControlsWindow(Surface):
         self.button_sprites.draw(self);
 
     def pos_in_play_button(self,
-        pos: tTuple[int, int]) -> bool:
+        pos: Vector2) -> bool:
         return self.play_button.rect.collidepoint(pos);
 
     def pos_in_pause_button(self,
-        pos: tTuple[int, int]) -> bool:
+        pos: Vector2) -> bool:
         return self.pause_button.rect.collidepoint(pos);
 
     def pos_in_stop_button(self,
-        pos: tTuple[int, int]) -> bool:
+        pos: Vector2) -> bool:
         return self.stop_button.rect.collidepoint(pos);
 
     @staticmethod
-    def process_shape_points(orig: tList[tTuple[int, int]],
+    def process_shape_points(orig: tList[Vector2],
         width: int,
-        center: tTuple[int, int]
-        ) -> tList[tTuple[int, int]]:
+        center: Vector2
+        ) -> tList[Vector2]:
+        
+        half_vec = Vector2(0.5);
 
-        points = [(
-            ((p[0] - 0.5) * width) + center[0],
-            ((p[1] - 0.5) * width) + center[1]
-        ) for p in orig];
+        points = [((p - half_vec) * width) + center for p in orig];
 
         return points;
 
     @staticmethod
     def draw_play_icon(surface: Surface,
         color: tTuple[int, int, int],
-        center: tTuple[int, int],
+        center: Vector2,
         width: int) -> None:
 
         points = ControlsWindow.process_shape_points(
@@ -174,7 +166,7 @@ class ControlsWindow(Surface):
     @staticmethod
     def draw_pause_icon(surface: Surface,
         color: tTuple[int, int, int],
-        center: tTuple[int, int],
+        center: Vector2,
         width: int) -> None:
 
         points0 = ControlsWindow.process_shape_points(
@@ -204,7 +196,7 @@ class ControlsWindow(Surface):
     @staticmethod
     def draw_stop_icon(surface: Surface,
         color: tTuple[int, int, int],
-        center: tTuple[int, int],
+        center: Vector2,
         width: int) -> None:
 
         points = ControlsWindow.process_shape_points(

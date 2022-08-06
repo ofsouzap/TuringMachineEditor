@@ -1,6 +1,6 @@
 from typing import List as tList;
 from typing import Tuple as tTuple;
-from pygame import Surface;
+from pygame import Surface, Vector2;
 import pygame;
 
 from machine import Machine, State, Transition;
@@ -140,6 +140,7 @@ class MachineWindow(Surface):
 
         s = TransitionsSprite(
             machine = self.machine,
+            parent_dims = self.get_size(),
             start = s1,
             end = s2,
             color = TRANSITION_COLOR,
@@ -152,7 +153,7 @@ class MachineWindow(Surface):
         self.transition_sprites.add(s);
 
     def get_state_in_pos(self,
-        pos: tTuple[int, int]
+        pos: Vector2
         ) -> State | None:
 
         for s in self.state_sprites:

@@ -1,6 +1,7 @@
 from typing import List as tList;
 from typing import Tuple as tTuple;
 from struct import pack, unpack;
+from pygame import Vector2;
 
 from machine import State, Transition, Machine;
 
@@ -69,7 +70,7 @@ class MachineSerializer:
             n, pos_x, pos_y = unpack(INT32_FMT * 3, bs[i : i + (INT32_SIZE * 3)]);
             i += INT32_SIZE * 3;
 
-            s = State(n, (pos_x, pos_y));
+            s = State(n, Vector2(pos_x, pos_y));
             m.states.append(s);
 
         # Read number of transitions

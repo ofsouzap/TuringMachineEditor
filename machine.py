@@ -1,6 +1,7 @@
 from typing import List as tList;
 from typing import Tuple as tTuple;
-from struct import pack, unpack;
+from struct import pack, unpack
+from pygame import Vector2;
 
 INT32_FMT = "i";
 INT32_SIZE = 4;
@@ -11,7 +12,7 @@ class State:
 
     def __init__(self,
         n: int,
-        pos: tTuple[int, int]):
+        pos: Vector2):
 
         self.n = n;
         self.pos = pos;
@@ -87,7 +88,7 @@ class Machine:
             i += 1;
 
     def add_state(self,
-        pos: tTuple[int, int]) -> State:
+        pos: Vector2) -> State:
 
         s = State(self.get_next_available_state_number(), pos);
 
