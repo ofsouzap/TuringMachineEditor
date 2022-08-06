@@ -30,8 +30,8 @@ class MachineSerializer:
         for s in m.states:
 
             MachineSerializer.add_bytes_to_bytearray(bs, pack(INT32_FMT, s.n));
-            MachineSerializer.add_bytes_to_bytearray(bs, pack(INT32_FMT, s.pos[0]));
-            MachineSerializer.add_bytes_to_bytearray(bs, pack(INT32_FMT, s.pos[1]));
+            MachineSerializer.add_bytes_to_bytearray(bs, pack(INT32_FMT, int(s.pos[0])));
+            MachineSerializer.add_bytes_to_bytearray(bs, pack(INT32_FMT, int(s.pos[1])));
 
         # Write number of transitions
 
