@@ -11,6 +11,7 @@ BUTTON_SEPARATION = 10;
 BUTTON_ICON_PADDING = 10;
 
 BUTTON_BG_COLOR = (200, 200, 200);
+SHADED_BUTTON_BG_COLOR = (150, 150, 150);
 BUTTON_ICON_COLOR = (0, 0, 0);
 
 # Icon shapes
@@ -69,6 +70,7 @@ class ControlsWindow(Surface):
             draw_icon_call = ControlsWindow.draw_pause_icon,
             icon_padding = BUTTON_ICON_PADDING,
             button_bg_color = BUTTON_BG_COLOR,
+            shaded_button_bg_color = SHADED_BUTTON_BG_COLOR,
             icon_color = BUTTON_ICON_COLOR,
             main_bg_color = self.bg_color
         );
@@ -83,6 +85,7 @@ class ControlsWindow(Surface):
             draw_icon_call = ControlsWindow.draw_play_icon,
             icon_padding = BUTTON_ICON_PADDING,
             button_bg_color = BUTTON_BG_COLOR,
+            shaded_button_bg_color = SHADED_BUTTON_BG_COLOR,
             icon_color = BUTTON_ICON_COLOR,
             main_bg_color = self.bg_color
         );
@@ -97,6 +100,7 @@ class ControlsWindow(Surface):
             draw_icon_call = ControlsWindow.draw_stop_icon,
             icon_padding = BUTTON_ICON_PADDING,
             button_bg_color = BUTTON_BG_COLOR,
+            shaded_button_bg_color = SHADED_BUTTON_BG_COLOR,
             icon_color = BUTTON_ICON_COLOR,
             main_bg_color = self.bg_color
         );
@@ -210,3 +214,30 @@ class ControlsWindow(Surface):
             color = color,
             points = points
         );
+
+    def set_play_button_shaded_state(self,
+        state: bool) -> None:
+        self.play_button.set_shaded_state(state);
+
+    def set_pause_button_shaded_state(self,
+        state: bool) -> None:
+        self.pause_button.set_shaded_state(state);
+
+    def set_stop_button_shaded_state(self,
+        state: bool) -> None:
+        self.stop_button.set_shaded_state(state);
+
+    def set_button_shading_stopped(self) -> None:
+        self.set_play_button_shaded_state(False);
+        self.set_pause_button_shaded_state(False);
+        self.set_stop_button_shaded_state(False);
+
+    def set_button_shading_playing(self) -> None:
+        self.set_play_button_shaded_state(True);
+        self.set_pause_button_shaded_state(False);
+        self.set_stop_button_shaded_state(False);
+
+    def set_button_shading_paused(self) -> None:
+        self.set_play_button_shaded_state(False);
+        self.set_pause_button_shaded_state(True);
+        self.set_stop_button_shaded_state(False);

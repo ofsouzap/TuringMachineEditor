@@ -200,6 +200,17 @@ class MainController:
         self.machine_window.set_machine(m);
         self.machine_window.refresh();
 
+    def refresh_control_buttons_shading(self) -> None:
+
+        if self.run_mode == RUN_MODE_STOPPED:
+            self.controls_window.set_button_shading_stopped();
+        
+        elif self.run_mode == RUN_MODE_PLAYING:
+            self.controls_window.set_button_shading_playing();
+        
+        elif self.run_mode == RUN_MODE_PAUSED:
+            self.controls_window.set_button_shading_paused();
+
     # Main loop
 
     def stop_main_loop(self) -> None:
@@ -248,6 +259,10 @@ class MainController:
             # If no transitions found, pause machine
 
             self.run_mode = RUN_MODE_PAUSED;
+
+            # Refresh controls button shading
+            self.refresh_control_buttons_shading();
+            self.controls_window.refresh();
 
         else:
 
@@ -472,7 +487,11 @@ class MainController:
         elif self.controls_window.pos_in_stop_button(pos):
             self.handle_controls_window_stop_button();
 
+        # Refresh control button shading
+        self.refresh_control_buttons_shading();
+
         # Refresh windows
+        self.controls_window.refresh();
         self.machine_window.update_state_sprites();
         self.tape_window.refresh();
 

@@ -126,15 +126,11 @@ class Machine:
 
         for t in self.transitions:
 
-            c = (t.start, t.end, t.read_symbol);
+            combs.append((t.start, t.end, t.read_symbol));
 
-            if c in combs:
-                return False;
+        new_comb = (new_t.start, new_t.end, new_t.read_symbol);
 
-            else:
-                combs.append(c);
-
-        return True;
+        return not (new_comb in combs);
 
     def get_state_by_number(self,
         n: int) -> State | None:

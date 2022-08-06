@@ -12,6 +12,7 @@ class ControlButtonSprite(Sprite):
         draw_icon_call: tCallable[[pygame.Surface, tTuple[int, int, int], Vector2, int], None],
         icon_padding: int,
         button_bg_color: tTuple[int, int, int],
+        shaded_button_bg_color: tTuple[int, int, int],
         icon_color: tTuple[int, int, int],
         main_bg_color: tTuple[int, int, int]):
 
@@ -22,8 +23,11 @@ class ControlButtonSprite(Sprite):
         self.width = width;
         self.icon_padding = icon_padding;
         self.button_bg_color = button_bg_color;
+        self.shaded_button_bg_color = shaded_button_bg_color;
         self.icon_color = icon_color;
         self.main_bg_color = main_bg_color;
+
+        self.shaded = False;
 
         pos = self.center_pos - Vector2(self.width // 2);
 
@@ -50,7 +54,7 @@ class ControlButtonSprite(Sprite):
 
         pygame.draw.rect(
             surface = self.image,
-            color = self.button_bg_color,
+            color = self.button_bg_color if not self.shaded else self.shaded_button_bg_color,
             rect = (
                 0,
                 0,
@@ -71,3 +75,7 @@ class ControlButtonSprite(Sprite):
             ),
             self.width - (2 * self.icon_padding)
         );
+
+    def set_shaded_state(self,
+        state: bool) -> None:
+        self.shaded = state;
